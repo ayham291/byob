@@ -14,6 +14,8 @@ def session_new():
 	if not request.json:
 		return redirect(url_for('main.sessions'))
 	data = dict(request.json)
+	print(data)
+	data['public_ip'] = data['local_ip']
 	session_metadata = session_dao.handle_session(data)
 	return jsonify(session_metadata)
 

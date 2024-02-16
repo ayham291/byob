@@ -76,12 +76,8 @@ def public_ip():
     Return public IP address of host machine
 
     """
-    import sys
-    if sys.version_info[0] > 2:
-        from urllib.request import urlopen
-    else:
-        from urllib import urlopen
-    return urlopen('http://api.ipify.org').read().decode()
+    import socket
+    return socket.gethostbyname(socket.gethostname())
 
 
 def local_ip():
